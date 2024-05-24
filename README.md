@@ -98,7 +98,7 @@ If you would like to contribute to this project, please fork the repository and 
 
 ## Contact
 
-If you have any questions, feel free to open an issue or contact the repository owner.
+If you have any questions, feel free to open an issue or contact me.
 
 ---
 
