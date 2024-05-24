@@ -1,4 +1,3 @@
-Sure, I'll include the necessary packages that are commonly used in an ASP.NET Core application with Entity Framework Core. Here's an updated version of your `README.md`:
 
 ```markdown
 # WebApplication3
