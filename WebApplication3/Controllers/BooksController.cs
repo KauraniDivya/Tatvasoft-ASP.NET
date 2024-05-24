@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using WebApplication3.EFCore;
 
 namespace WebApplication3.Controllers
 {
@@ -8,42 +11,85 @@ namespace WebApplication3.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        static List<Books> books = new List<Books>();
-        // GET: api/<BooksController>
+        private readonly EF_DataContext _context;
+
+        public BooksController(EF_DataContext context)
+        {
+            _context = context;
+        }
+
         [HttpGet]
-        public IEnumerable<Books> Get()
+        public async Task<ActionResult<IEnumerable<Books>>> GetBooks()
         {
-            return books;
+            return await _context.Books.ToListAsync();
         }
 
-        // GET api/<BooksController>/5
         [HttpGet("{id}")]
-        public Books Get(int id)
+        public async Task<ActionResult<Books>> GetBook(int id)
         {
-            return books.FirstOrDefault(s => s.Id == id);
+            var book = await _context.Books.FindAsync(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            return book;
         }
 
-        // POST api/<BooksController>
         [HttpPost]
-        public void Post([FromBody] Books value)
+        public async Task<ActionResult<Books>> PostBook(Books book)
         {
-            books.Add(value);
+            _context.Books.Add(book);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
         }
 
-        // PUT api/<BooksController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] Books value)
+        public async Task<IActionResult> PutBook(int id, Books book)
         {
-           int i = books.FindIndex(s => s.Id == id);
-           if (i>=0)
-                books[i] = value;
+            if (id != book.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(book).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!BookExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // DELETE api/<BooksController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> DeleteBook(int id)
         {
-            books.RemoveAll(s => s.Id == id);
+            var book = await _context.Books.FindAsync(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            _context.Books.Remove(book);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool BookExists(int id)
+        {
+            return _context.Books.Any(e => e.Id == id);
         }
     }
 }
