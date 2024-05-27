@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Books;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebApplication3.EFCore
 {
@@ -6,6 +7,7 @@ namespace WebApplication3.EFCore
     {
         public EF_DataContext(DbContextOptions<EF_DataContext> options) : base(options) { }
 
-        public DbSet<Books> Books { get; set; }
+        public DbSet<Book> Books { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

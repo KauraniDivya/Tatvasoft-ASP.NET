@@ -19,13 +19,13 @@ namespace WebApplication3.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Books>>> GetBooks()
+        public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
         {
             return await _context.Books.ToListAsync();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Books>> GetBook(int id)
+        public async Task<ActionResult<Book>> GetBook(int id)
         {
             var book = await _context.Books.FindAsync(id);
             if (book == null)
@@ -36,7 +36,7 @@ namespace WebApplication3.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Books>> PostBook(Books book)
+        public async Task<ActionResult<Book>> PostBook(Book book)
         {
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
@@ -44,7 +44,7 @@ namespace WebApplication3.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBook(int id, Books book)
+        public async Task<IActionResult> PutBook(int id, Book book)
         {
             if (id != book.Id)
             {
