@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 public class User
 {
@@ -75,7 +76,6 @@ public class ResetPassword
     {
     }
 }
-
 
 public class RegisterViewModel
 {

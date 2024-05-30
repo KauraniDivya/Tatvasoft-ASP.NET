@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -8,6 +7,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using WebApplication3.EFCore;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace Books.Controllers
 {
@@ -73,15 +74,16 @@ namespace Books.Controllers
         }
 
         [HttpGet("users")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetUsers()
         {
             var users = _context.Users
                 .Select(u => new
                 {
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
+                    u.FirstName,
+                    u.LastName,
                     Email = u.EmailAddress,
-                    UserType = u.UserType
+                    u.UserType
                 })
                 .ToList();
 
@@ -180,10 +182,15 @@ namespace Books.Controllers
                 new Claim(ClaimTypes.Email, user.EmailAddress),
                 new Claim(ClaimTypes.GivenName, user.FirstName),
                 new Claim(ClaimTypes.Surname, user.LastName),
-                new Claim(ClaimTypes.Role, user.UserType)
+                new Claim(ClaimTypes.Role, user.UserType) // Ensure role is included
             };
 
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims, expires: DateTime.Now.AddMinutes(15), signingCredentials: credentials);
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(15),
+                signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
