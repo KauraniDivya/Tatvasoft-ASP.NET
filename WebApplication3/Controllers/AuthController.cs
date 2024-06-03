@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Books.Controllers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -7,8 +8,6 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using WebApplication3.EFCore;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace Books.Controllers
 {
@@ -34,7 +33,7 @@ namespace Books.Controllers
             if (user != null)
             {
                 var token = Generate(user);
-                return Ok(new { Message = "Welcome " + user.FirstName, Token = token });
+                return Ok(new { Message = "Login Successfully", Token = token });
             }
 
             return NotFound("User not found");
@@ -74,16 +73,15 @@ namespace Books.Controllers
         }
 
         [HttpGet("users")]
-        [Authorize(Roles = "Admin")]
         public IActionResult GetUsers()
         {
             var users = _context.Users
                 .Select(u => new
                 {
-                    u.FirstName,
-                    u.LastName,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
                     Email = u.EmailAddress,
-                    u.UserType
+                    UserType = u.UserType
                 })
                 .ToList();
 
@@ -178,19 +176,17 @@ namespace Books.Controllers
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.EmailAddress),
-                new Claim(ClaimTypes.GivenName, user.FirstName),
-                new Claim(ClaimTypes.Surname, user.LastName),
-                new Claim(ClaimTypes.Role, user.UserType) // Ensure role is included
-            };
+        new Claim("userId", user.Id.ToString()),
+        new Claim("fullName", user.UserFullName),
+        new Claim("firstName", user.FirstName),
+        new Claim("lastName", user.LastName),
+        new Claim("phoneNumber", user.PhoneNumber),
+        new Claim("emailAddress", user.EmailAddress),
+        new Claim("userType", user.UserType),
+        new Claim("userImage", user.UserImage)
+    };
 
-            var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(15),
-                signingCredentials: credentials);
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims, expires: DateTime.Now.AddMinutes(15), signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

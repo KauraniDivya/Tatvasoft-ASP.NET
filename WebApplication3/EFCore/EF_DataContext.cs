@@ -10,5 +10,10 @@ namespace WebApplication3.EFCore
         public DbSet<Book> Books { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<ForgotPassword> ForgotPasswords { get; set; }
+
+        public DbSet<UserDetail> UserDetails { get; set; }
+
+        public DbSet<MissionSkill> MissionSkills { get; set; }
+        public DbSet<MissionTheme> MissionThemes { get; set; }
     }
 }

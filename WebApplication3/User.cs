@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 public class User
 {
@@ -22,6 +22,7 @@ public class User
     public string UserImage { get; set; } = "";
     public string UserFullName { get; set; }
     public ICollection<ForgotPassword> ForgotPasswords { get; set; }
+    public ICollection<UserDetail> UserDetails { get; set; }
 }
 
 public class UserDetail
@@ -44,6 +45,7 @@ public class UserDetail
     public string MySkills { get; set; }
     public string UserImage { get; set; }
     public bool Status { get; set; }
+    public User User { get; set; } // Navigation property
 }
 
 public class ForgotPassword
@@ -71,7 +73,6 @@ public class ResetPassword
 {
     public string ResetToken { get; set; }
     public string NewPassword { get; set; }
-
     public ResetPassword() // Parameterless constructor
     {
     }
@@ -81,25 +82,43 @@ public class RegisterViewModel
 {
     [Required]
     public string FirstName { get; set; }
-
     [Required]
     public string LastName { get; set; }
-
     [Required]
     public string PhoneNumber { get; set; }
-
     [Required]
     [EmailAddress]
     public string EmailAddress { get; set; }
-
     [Required]
     public string UserType { get; set; }
-
     [Required]
     [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
     [DataType(DataType.Password)]
     public string Password { get; set; }
+    [DataType(DataType.Password)]
+    [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+    public string ConfirmPassword { get; set; }
+}
 
+public class UpdateUserViewModel
+{
+    [Required]
+    public int Id { get; set; }
+    [Required]
+    public string FirstName { get; set; }
+    [Required]
+    public string LastName { get; set; }
+    [Required]
+    public string PhoneNumber { get; set; }
+    [Required]
+    [EmailAddress]
+    public string EmailAddress { get; set; }
+    [Required]
+    public string UserType { get; set; }
+    [Required]
+    [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+    [DataType(DataType.Password)]
+    public string Password { get; set; }
     [DataType(DataType.Password)]
     [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
     public string ConfirmPassword { get; set; }
